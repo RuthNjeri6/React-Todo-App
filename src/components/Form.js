@@ -9,8 +9,12 @@ export default function Form(props) {
 
   function handleSubmit(e) {
     e.preventDefault();
-    props.addTask(name);
-    setName("");
+    if (name.length !== 0) {
+      props.addTask(name);
+      setName("");
+    } else {
+      alert("input field must not be empty");
+    }
   }
 
   return (

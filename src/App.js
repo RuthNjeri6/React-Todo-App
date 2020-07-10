@@ -42,7 +42,11 @@ function App(props) {
     const editedTaskList = tasks.map((task) => {
       //if this task has the same ID as the edited one
       if (id === task.id) {
-        return { ...task, name: newName };
+        if (newName.length !== 0) {
+          return { ...task, name: newName };
+        } else {
+          alert("input field must not be empty!");
+        }
       }
       return task;
     });
@@ -79,7 +83,6 @@ function App(props) {
       {filterList}
       <h2 id="list-heading">{headingText}</h2>
       <ul
-        role="list"
         className="todo-list stack-large stack-exception"
         aria-labelledby="list-heading"
       >
