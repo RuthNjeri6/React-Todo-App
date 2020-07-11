@@ -1,6 +1,39 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
+
+import { useDrag, useDrop } from "react-dnd";
 
 export default function Todo(props) {
+  const type = "List";
+
+  const ref = useRef(null); //initalize the reference
+
+  // add a droppable element using useDrop
+  const [, drop] = useDrop({
+    accept: type,
+    hover(item) {
+      if (!ref.current) {
+        return;
+      }
+      const dragItem = item.index;
+      const hoverItem = props.index;
+      if (dragItem === hoverItem) {
+        return;
+      }
+      props.moveTask(dragItem, hoverItem);
+      item.index = hoverItem;
+    },
+  });
+
+  //add a draggle item  using useDrag hook
+  const [{ isDragging }, drag] = useDrag({
+    item: { type, id: props.id, index: props.index },
+    collect: (monitor) => ({
+      isDragging: monitor.isDragging(),
+    }),
+  });
+
+  drag(drop(ref));
+
   const [isEditing, setEditing] = useState(false);
   const [newName, setNewName] = useState("");
 
@@ -72,5 +105,9 @@ export default function Todo(props) {
     </div>
   );
 
-  return <li className="todo">{isEditing ? editingTemplate : viewTemplate}</li>;
+  return (
+    <li ref={ref} style={{ opacity: isDragging ? 0 : 1 }} className="todo">
+      {isEditing ? editingTemplate : viewTemplate}
+    </li>
+  );
 }

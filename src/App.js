@@ -3,6 +3,9 @@ import Todo from "./components/Todo";
 import Form from "./components/Form";
 import FilterButton from "./components/FilterButton";
 import { nanoid } from "nanoid";
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
+import update from "immutability-helper";
 
 const FILTER_MAP = {
   All: () => true,
@@ -52,9 +55,23 @@ function App(props) {
     });
     setTasks(editedTaskList);
   }
+  const moveTask = (dragIndex, hoverIndex) => {
+    //get the dragged element
+    const draggedTask = tasks[dragIndex];
+
+    setTasks(
+      update(tasks, {
+        $splice: [
+          [dragIndex, 1],
+          [hoverIndex, 0, draggedTask],
+        ],
+      })
+    );
+  };
+
   const taskList = tasks
     .filter(FILTER_MAP[filter])
-    .map((task) => (
+    .map((task, index) => (
       <Todo
         id={task.id}
         name={task.name}
@@ -63,8 +80,11 @@ function App(props) {
         toggleTaskCompleted={toggleTaskCompleted}
         deleteTask={deleteTask}
         editTask={editTask}
+        index={index}
+        moveTask={moveTask}
       />
     ));
+
   const filterList = FILTER_NAMES.map((name) => (
     <FilterButton
       key={name}
@@ -80,13 +100,14 @@ function App(props) {
     <div className="todoapp stack-large">
       <h1>TodoMatic</h1>
       <Form addTask={addTask} />
-      {filterList}
+      <div className="filters btn-group stack-exception"> {filterList}</div>
+
       <h2 id="list-heading">{headingText}</h2>
       <ul
         className="todo-list stack-large stack-exception"
         aria-labelledby="list-heading"
       >
-        {taskList}
+        <DndProvider backend={HTML5Backend}>{taskList}</DndProvider>
       </ul>
     </div>
   );

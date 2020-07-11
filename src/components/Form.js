@@ -13,7 +13,7 @@ export default function Form(props) {
       props.addTask(name);
       setName("");
     } else {
-      alert("input field must not be empty");
+      alert("input field must not be empty!");
     }
   }
 
